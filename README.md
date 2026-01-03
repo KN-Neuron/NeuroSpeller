@@ -1,8 +1,6 @@
 # NeuroSpeller
 SSVEP-based BCI speller 
 
-## Quick Start
-
 ### Requirements
 - Python 3.11 or higher 
 - [Poetry](https://python-poetry.org/)
