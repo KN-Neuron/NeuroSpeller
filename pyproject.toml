@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "NeuroSpeller"
+version = "0.1.0"
+description = ""
+authors = [""]
+readme = "README.md"
+package-mode=false
+
+[tool.poetry.dependencies]
+python = "^3.11"
+numpy = "^1.26.0"
+
+[tool.poetry.group.app.dependencies]
+brainaccess = "^3.6.1"
+
+[tool.poetry.group.data.dependencies]
+scikit-learn = "^1.4.0"
+mne = "^1.11.0"
+pandas = "^2.2.0"
+matplotlib = "^3.8.0"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
