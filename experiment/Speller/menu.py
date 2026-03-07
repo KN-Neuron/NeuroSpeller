@@ -1,0 +1,24 @@
+import pygame
+import config
+from Speller import SSVEPStimulus
+
+def draw_menu(screen):
+    screen.fill((0, 0, 0)) 
+    
+    btn_offline = SSVEPStimulus(x=config.WIDTH//2 - 350, y=config.HEIGHT//2 - 100, 
+                                size=300, freq=0, label="OFFLINE (Calibration)")
+    
+    btn_online = SSVEPStimulus(x=config.WIDTH//2 + 50, y=config.HEIGHT//2 - 100, 
+                               size=300, freq=0, label="ONLINE\n(Speller)")
+    
+    btn_offline.current_color = (0, 130, 0)
+    btn_online.current_color = (130, 0, 0)
+    
+    btn_offline.draw(screen)
+    btn_online.draw(screen)
+    
+    font = pygame.font.SysFont('Arial', 24)
+    text = font.render("Press 1 for Offline or 2 for Online", True, config.COLOR_WHITE)
+    screen.blit(text, (config.WIDTH//2 - text.get_width()//2, config.HEIGHT//2 + 250))
+    
+    return btn_offline.rect, btn_online.rect
