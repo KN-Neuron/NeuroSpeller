@@ -9,6 +9,7 @@ package-mode=false
 [tool.poetry.dependencies]
 python = "^3.11"
 numpy = "^1.26.0"
+pygame = "^2.6.1"
 
 [tool.poetry.group.app.dependencies]
 brainaccess = "^3.6.1"
