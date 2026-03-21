@@ -6,11 +6,11 @@ from config import *
 from Speller import SSVEPStimulus, SpellerGrid
 from Speller import menu
 
-from experiment.eeg_headset.egg_handler import BrainAccessBackend
+from experiment.eeg_headset.eeg_handler import BrainAccessBackend
 
 # 1. PyGame setup
 pygame.init()
-eeg_handler = BrainAccessBackend(device_name="BA-MIDI")
+eeg_handler = BrainAccessBackend(device_name="BA-MIDI", simulate=False)
 
 # 2. Ustawienia ekranu
 screen = pygame.display.set_mode((WIDTH, HEIGHT), vsync=1)
@@ -58,12 +58,9 @@ while running:
     screen.fill((0, 0, 0))
 
     if state == "MENU":
-        try:
-            is_connected = eeg_handler.eeg.is_connected()
-        except Exception as e:
-            print(e)
-        finally:
-            menu.draw_menu(screen, is_connected = False)
+        # Użycie bezpiecznej metody z klasy backendu
+        connected = eeg_handler.is_device_connected()
+        menu.draw_menu(screen, is_connected=connected)
 
     if state == "OFFLINE":
         grid.update()
