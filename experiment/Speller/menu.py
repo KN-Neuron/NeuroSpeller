@@ -2,7 +2,7 @@ import pygame
 import config
 from Speller import SSVEPStimulus
 
-def draw_menu(screen):
+def draw_menu(screen, is_connected):
     screen.fill((0, 0, 0)) 
     
     btn_offline = SSVEPStimulus(x=config.WIDTH//2 - 350, y=config.HEIGHT//2 - 100, 
@@ -20,5 +20,12 @@ def draw_menu(screen):
     font = pygame.font.SysFont('Arial', 24)
     text = font.render("Press 1 for Offline or 2 for Online", True, config.COLOR_WHITE)
     screen.blit(text, (config.WIDTH//2 - text.get_width()//2, config.HEIGHT//2 + 250))
-    
+
+    status_font = pygame.font.SysFont('Arial', 20, bold=True)
+    if is_connected:
+        status_text = status_font.render("Status: Połączono", True, config.COLOR_GREEN)
+    else:
+        status_text = status_font.render("Status: Nie połączono", True, (255, 0, 0))
+    screen.blit(status_text, (20, 20))
+
     return btn_offline.rect, btn_online.rect
