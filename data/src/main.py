@@ -1,5 +1,5 @@
 import argparse
-from data_reader import main as read_data
+from data_reader import DataReader, MatDataReader
 from filter import main as filter_data
 from fft_analysis import main as fft_analysis_main
 from filter_plotter import (
@@ -11,12 +11,18 @@ from fft_plotter import (
     plot_grouped_fft,
     plot_single_trial_fft,
 )
-from consts import OUTPUT_DIR
+from consts import OUTPUT_DIR, DATA_READERS
 
 
-def main(filename: str, plot_filter: bool, plot_fft: bool):
+def main(
+    filename: str,
+    plot_filter: bool,
+    plot_fft: bool,
+    reader: DataReader,
+    output_dir: str = OUTPUT_DIR,
+):
     print("\nReading data...")
-    trials = read_data(filename)
+    trials = reader.get_all_trials(filename)
 
     print("\nFiltering data...")
     filtered_epochs = filter_data(trials)
@@ -46,20 +52,21 @@ def main(filename: str, plot_filter: bool, plot_fft: bool):
                     r["ch_idx"],
                     r["channel"],
                     r["snr_db"],
-                    OUTPUT_DIR,
+                    output_dir,
                 )
 
         for ef in all_results:
-            plot_grouped_fft(ef, all_results[ef], stats, OUTPUT_DIR)
+            plot_grouped_fft(ef, all_results[ef], stats, output_dir)
 
-        plot_snr_heatmap(stats, OUTPUT_DIR)
+        plot_snr_heatmap(stats, output_dir)
 
     print("\nPipeline complete!")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run the full SSVEP pipeline.")
-    parser.add_argument("--filename", type=str, help="Path to the .mat file")
+    parser.add_argument("--filename", type=str, help="Path to the data file")
+    parser.add_argument("--data_type", type=str, help="csv or mat")
     parser.add_argument(
         "--plot_filter",
         action="store_true",
@@ -70,6 +77,9 @@ if __name__ == "__main__":
         action="store_true",
         help="Generate plots for the FFT results (SNR heatmap, FFT spectrum)",
     )
+    parser.add_argument("--output", type=str, help="output directory")
     args = parser.parse_args()
 
-    main(args.filename, args.plot_filter, args.plot_fft)
+    reader_class = DATA_READERS.get(args.data_type)
+
+    main(args.filename, args.plot_filter, args.plot_fft, reader_class(), args.output)
