@@ -4,7 +4,7 @@ from collections import defaultdict
 
 from consts import (
     SAMPLING_RATE,
-    SAMPLES_PER_5_SEC,
+    WINDOW_TIME_FRAME,
     SNR_NEIGHBOR_BINS,
     SNR_EXCLUDE_BINS,
     SNR_THRESHOLD_DB,
@@ -16,8 +16,8 @@ from consts import (
 from data_classes import trial_info, TrialType
 from utils import group_trials_by_frequency, get_trials_by_type
 
-N = SAMPLES_PER_5_SEC
-freqs_fft = np.fft.rfftfreq(N, d=1.0 / SAMPLING_RATE)
+samples_per_trial = SAMPLING_RATE * WINDOW_TIME_FRAME
+freqs_fft = np.fft.rfftfreq(samples_per_trial, d=1.0 / SAMPLING_RATE)
 
 
 def compute_rfft(signal: np.ndarray) -> np.ndarray:
@@ -27,7 +27,7 @@ def compute_rfft(signal: np.ndarray) -> np.ndarray:
 
 def compute_fft_magnitude(signal: np.ndarray) -> np.ndarray:
     fft_result = compute_rfft(signal)
-    magnitude = (2.0 / N) * np.abs(fft_result)
+    magnitude = (2.0 / samples_per_trial) * np.abs(fft_result)
     return magnitude
 
 
