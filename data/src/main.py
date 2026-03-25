@@ -1,5 +1,5 @@
 import argparse
-from data_reader import DataReader
+from data_reader import DataReader, MatDataReader, CSVDataReader
 from filter import main as filter_data
 from fft_analysis import main as fft_analysis_main
 from filter_plotter import (
@@ -11,8 +11,14 @@ from fft_plotter import (
     plot_grouped_fft,
     plot_single_trial_fft,
 )
-from consts import OUTPUT_DIR, DATA_READERS
+from consts import OUTPUT_DIR
 import numpy as np
+
+# Data file type to reader map
+DATA_READERS = {
+    "csv": CSVDataReader,
+    "mat": MatDataReader,
+}
 
 
 def main(
@@ -69,8 +75,19 @@ def main(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run the full SSVEP pipeline.")
-    parser.add_argument("--filename", type=str, help="Path to the data file")
-    parser.add_argument("--data_type", type=str, help="csv or mat")
+    parser.add_argument(
+        "--filename",
+        type=str,
+        required=True,
+        help="Path to the data file",
+    )
+    parser.add_argument(
+        "--data_type",
+        type=str,
+        required=True,
+        choices=["csv", "mat"],
+        help="csv or mat",
+    )
     parser.add_argument(
         "--plot_filter",
         action="store_true",
@@ -81,7 +98,9 @@ if __name__ == "__main__":
         action="store_true",
         help="Generate plots for the FFT results (SNR heatmap, FFT spectrum)",
     )
-    parser.add_argument("--output", type=str, help="output directory")
+    parser.add_argument(
+        "--output", default=OUTPUT_DIR, type=str, help="output directory"
+    )
     args = parser.parse_args()
 
     reader_class = DATA_READERS.get(args.data_type)

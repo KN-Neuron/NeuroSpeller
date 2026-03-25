@@ -1,5 +1,4 @@
 import numpy as np
-from data_reader import MatDataReader, CSVDataReader
 
 SAMPLING_RATE = 250
 WINDOW_TIME_FRAME = 5
@@ -41,9 +40,3 @@ CHANNELS = {
 CHANNELS_TIME = {125: "Oz", 115: "O1", 149: "O2", 101: "Pz"}
 
 OUTPUT_DIR = "ssvep_analysis_output"
-
-# Data file type to reader map
-DATA_READERS = {
-    "csv": CSVDataReader,
-    "mat": MatDataReader,
-}
