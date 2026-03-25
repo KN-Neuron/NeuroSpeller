@@ -12,6 +12,7 @@ from fft_plotter import (
     plot_single_trial_fft,
 )
 from consts import OUTPUT_DIR, DATA_READERS
+import numpy as np
 
 
 def main(
@@ -24,6 +25,9 @@ def main(
     print("\nReading data...")
     trials = reader.get_all_trials(filename)
 
+    # Save raw (unfiltered) epochs before applying any filtering
+    raw_epochs = np.array([t.epoch for t in trials])
+
     print("\nFiltering data...")
     filtered_epochs = filter_data(trials)
 
@@ -32,8 +36,8 @@ def main(
 
     if plot_filter:
         print("\nGenerating filter plots...")
-        plot_filter_time_domain(trials, filtered_epochs, filtered_epochs)
-        plot_filter_psd_comparison(trials, filtered_epochs, filtered_epochs)
+        plot_filter_time_domain(trials, raw_epochs, filtered_epochs)
+        plot_filter_psd_comparison(trials, raw_epochs, filtered_epochs)
 
     print("\nPerforming FFT and SNR analysis...")
     fft_results = fft_analysis_main(trials)
