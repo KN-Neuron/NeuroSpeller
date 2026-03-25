@@ -1,5 +1,5 @@
 import argparse
-from data_reader import DataReader, MatDataReader
+from data_reader import DataReader
 from filter import main as filter_data
 from fft_analysis import main as fft_analysis_main
 from filter_plotter import (
