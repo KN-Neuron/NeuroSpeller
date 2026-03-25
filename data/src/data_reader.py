@@ -1,7 +1,7 @@
 from collections import defaultdict
 import scipy.io
 from data_classes import *
-from consts import *
+from consts import EEG_KEY, DIN_KEY, SAMPLING_RATE, EXPECTED_FREQS, ADAPT_TRIALS, WINDOW_TIME_FRAME
 from abc import ABC, abstractmethod
 
 
