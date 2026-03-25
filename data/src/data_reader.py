@@ -24,7 +24,7 @@ class DataReader(ABC):
 
 class MatDataReader(DataReader):
     def _load_data(
-        filename: str, sampling_rate: int = SAMPLING_RATE
+        self, filename: str, sampling_rate: int = SAMPLING_RATE
     ) -> tuple[np.ndarray, np.ndarray, list[int]]:
         mat_data = scipy.io.loadmat(filename)
         eeg_data = mat_data[EEG_KEY]
@@ -36,7 +36,7 @@ class MatDataReader(DataReader):
         return eeg_data, latencies_ms, latencies
 
     def _group_din_markers_into_trials(
-        latencies: list[int], gap_threshold_samples: int
+        self, latencies: list[int], gap_threshold_samples: int
     ) -> list[trial_group]:
         trial_groups = []
         current_start_idx = 0
@@ -69,6 +69,7 @@ class MatDataReader(DataReader):
         return trial_groups
 
     def _extract_trials(
+        self,
         eeg_data: np.ndarray,
         latencies_ms: list[int],
         trial_groups: list[trial_group],
