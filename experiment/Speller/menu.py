@@ -23,7 +23,7 @@ def draw_menu(screen, is_connected):
 
     status_font = pygame.font.SysFont('Arial', 20, bold=True)
     if is_connected:
-        status_text = status_font.render("Status: Połączono", True, config.COLOR_GREEN)
+        status_text = status_font.render("Status: Połączono", True, config.COLOR_WHITE)
     else:
         status_text = status_font.render("Status: Nie połączono", True, (255, 0, 0))
     screen.blit(status_text, (20, 20))
