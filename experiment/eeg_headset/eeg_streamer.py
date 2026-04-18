@@ -118,7 +118,7 @@ class EEGStreamer:
             chunk = noise
 
             # 4. Czysty sygnał o zadanej częstotliwości (np. 10 Hz)
-            signal = 15.0 * np.sin(2 * np.pi * target_freq * t) # Zwiększyłem lekko amplitudę na 15.0
+            signal = 15.0 * np.sin(2 * np.pi * target_freq * t)
 
             # 5. WSTRZYKNIĘCIE do tych samych kanałów, które czyta bci_engine.py
             target_channels = [1, 6, 11]
