@@ -1,11 +1,7 @@
 
 # --- Ustawienia ekranu ---
 WIDTH, HEIGHT = 1280, 720
-REFRESH_RATE = 60  
-
-# --- Parametry SSVEP ---
-# 6 częstotliwości
-FREQS = [7.5, 8.57, 10.0, 12.0, 15.0, 8.0] 
+REFRESH_RATE = 60
 
 # --- Struktura Alfabetu (Drzewo) ---
 

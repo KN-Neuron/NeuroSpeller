@@ -2,28 +2,27 @@ import pygame
 import sys
 import gc
 
-from config import *
-from Speller import SSVEPStimulus, SpellerGrid
-from Speller import menu
+from config.app_config import *
+from ui import SSVEPStimulus, SpellerGrid, menu
 
-from experiment.eeg_headset.eeg_streamer import EEGStreamer
-from experiment.eeg_headset.bci_engine import BCIEngine
-from data.src.predictor import CCAPredictor
-from data.src.preprocessor import EEGPreprocessor
-from data.src.consts import (
+from headset.streamer import Streamer
+from pipeline.bci_engine import BCIEngine
+from pipeline.predictor import CCAPredictor
+from pipeline.preprocessor import EEGPreprocessor
+from config.bci_config import (
     TARGET_CHANNELS,
     SG_WINDOW,
     SG_POLYORDER,
     SAMPLING_RATE,
-    EXPECTED_FREQS,
+    FREQS,
     WINDOW_TIME_FRAME,
 )
 
 # 1. PyGame setup
 pygame.init()
-streamer = EEGStreamer(device_name="BA MIDI 072", simulate=False)
+streamer = Streamer(device_name="BA MIDI 072", simulate=False)
 preprocessor = EEGPreprocessor(TARGET_CHANNELS, SG_WINDOW, SG_POLYORDER)
-predictor = CCAPredictor(EXPECTED_FREQS, SAMPLING_RATE, WINDOW_TIME_FRAME, 0.3)
+predictor = CCAPredictor(FREQS, SAMPLING_RATE, WINDOW_TIME_FRAME, 0.3)
 bci_engine = BCIEngine(
     streamer=streamer, predictor=predictor, preprocessor=preprocessor
 )

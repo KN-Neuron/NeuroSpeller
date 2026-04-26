@@ -28,7 +28,7 @@ class CCAPredictor(Predictor):
 
     def _generate_reference_signals_for_frequency(
         self, length: int, freq: float, num_harmonics=2
-    ):
+    ) -> np.ndarray:
         t = np.arange(length) / self.sampling_rate
         y = []
         for i in range(1, num_harmonics + 1):
