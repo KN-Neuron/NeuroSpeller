@@ -8,11 +8,25 @@ from Speller import menu
 
 from experiment.eeg_headset.eeg_streamer import EEGStreamer
 from experiment.eeg_headset.bci_engine import BCIEngine
+from data.src.predictor import CCAPredictor
+from data.src.preprocessor import EEGPreprocessor
+from data.src.consts import (
+    TARGET_CHANNELS,
+    SG_WINDOW,
+    SG_POLYORDER,
+    SAMPLING_RATE,
+    EXPECTED_FREQS,
+    WINDOW_TIME_FRAME,
+)
 
 # 1. PyGame setup
 pygame.init()
 streamer = EEGStreamer(device_name="BA MIDI 072", simulate=False)
-bci_engine = BCIEngine(streamer=streamer, threshold=1.5)
+preprocessor = EEGPreprocessor(TARGET_CHANNELS, SG_WINDOW, SG_POLYORDER)
+predictor = CCAPredictor(EXPECTED_FREQS, SAMPLING_RATE, WINDOW_TIME_FRAME, 0.3)
+bci_engine = BCIEngine(
+    streamer=streamer, predictor=predictor, preprocessor=preprocessor
+)
 streamer.start()
 
 # 2. Ustawienia ekranu
@@ -63,7 +77,6 @@ while running:
 
                 streamer.send_marker("START-PHASE-ONLINE")
 
-
     screen.fill((0, 0, 0))
 
     if state == "MENU":
@@ -79,7 +92,7 @@ while running:
 
         # RYSOWANIE PASKA TEKSTU NA GÓRZE EKRANU
         pygame.draw.rect(screen, COLOR_GRAY, (50, 20, WIDTH - 100, 70))
-        font_speller = pygame.font.SysFont('Arial', 48, bold=True)
+        font_speller = pygame.font.SysFont("Arial", 48, bold=True)
         text_surf = font_speller.render(typed_text + "_", True, COLOR_WHITE)
         screen.blit(text_surf, (70, 30))
 
