@@ -2,14 +2,15 @@ import pygame
 import sys
 import gc
 
-from config.app_config import *
-from ui import SSVEPStimulus, SpellerGrid, menu
+from experiment.src.config.app_config import *
+from experiment.src.ui.grid import SpellerGrid
+from experiment.src.ui.menu import draw_menu
 
-from headset.streamer import Streamer
-from pipeline.bci_engine import BCIEngine
-from pipeline.predictor import CCAPredictor
-from pipeline.preprocessor import EEGPreprocessor
-from config.bci_config import (
+from experiment.src.headset.streamer import Streamer
+from experiment.src.pipeline.bci_engine import BCIEngine
+from experiment.src.pipeline.predictor import CCAPredictor
+from experiment.src.pipeline.preprocessor import EEGPreprocessor
+from experiment.src.config.bci_config import (
     TARGET_CHANNELS,
     SG_WINDOW,
     SG_POLYORDER,
@@ -79,7 +80,7 @@ while running:
     screen.fill((0, 0, 0))
 
     if state == "MENU":
-        menu.draw_menu(screen, is_connected=streamer.connected)
+        draw_menu(screen, is_connected=streamer.connected)
 
     if state == "OFFLINE":
         grid.update()
