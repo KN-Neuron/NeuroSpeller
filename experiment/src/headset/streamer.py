@@ -4,11 +4,11 @@ from brainaccess import core
 from brainaccess.core.eeg_manager import EEGManager
 import brainaccess.core.eeg_channel as eeg_channel
 from brainaccess.core.gain_mode import GainMode
-from data.src.consts import SAMPLING_RATE
-from typing import Any, Optional
+from experiment.src.config.bci_config import SAMPLING_RATE
+from typing import Any
 
 
-class EEGStreamer:
+class Streamer:
     def __init__(
         self,
         device_name: str = "BA MIDI 072",

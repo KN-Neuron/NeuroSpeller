@@ -1,12 +1,12 @@
-from eeg_streamer import EEGStreamer
-from data.src.predictor import Predictor
-from data.src.preprocessor import Preprocessor
+from experiment.src.headset.streamer import Streamer
+from experiment.src.pipeline.predictor import Predictor
+from experiment.src.pipeline.preprocessor import Preprocessor
 
 
 class BCIEngine:
     def __init__(
         self,
-        streamer: EEGStreamer,
+        streamer: Streamer,
         predictor: Predictor,
         preprocessor: Preprocessor,
     ):
