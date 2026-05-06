@@ -18,3 +18,7 @@ TARGET_CHANNELS = [1, 2, 3]
 # Savitzky-Golay parameters
 SG_WINDOW = 21
 SG_POLYORDER = 3
+
+# Faza offline (1000 = 1 sekunda)
+TRIAL_DURATION_MS = 3000  # Czas patrzenia na kafelek
+REST_DURATION_MS = 1000   # Czas przerwy na odpoczynek oczu
