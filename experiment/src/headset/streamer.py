@@ -4,7 +4,7 @@ from brainaccess import core
 from brainaccess.core.eeg_manager import EEGManager
 import brainaccess.core.eeg_channel as eeg_channel
 from brainaccess.core.gain_mode import GainMode
-from experiment.src.config.bci_config import SAMPLING_RATE
+from src.config.bci_config import SAMPLING_RATE
 from typing import Any
 
 

@@ -1,6 +1,6 @@
-from experiment.src.headset.streamer import Streamer
-from experiment.src.pipeline.predictor import Predictor
-from experiment.src.pipeline.preprocessor import Preprocessor
+from src.headset.streamer import Streamer
+from src.pipeline.predictor import Predictor
+from src.pipeline.preprocessor import Preprocessor
 
 
 class BCIEngine:

@@ -1,6 +1,6 @@
 import pygame
-from experiment.src.config.app_config import WIDTH, HEIGHT, COLOR_WHITE
-from experiment.src.ui.stimulus import SSVEPStimulus
+from src.config.app_config import WIDTH, HEIGHT, COLOR_WHITE
+from src.ui.stimulus import SSVEPStimulus
 
 def draw_menu(screen, is_connected):
     screen.fill((0, 0, 0)) 

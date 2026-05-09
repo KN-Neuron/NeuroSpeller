@@ -2,16 +2,16 @@ import pygame
 import sys
 import gc
 
-from experiment.src.config.app_config import *
-from experiment.src.config.scenarios import SCENARIOS
-from experiment.src.ui.grid import SpellerGrid
-from experiment.src.ui.menu import draw_menu
+from src.config.app_config import *
+from src.config.scenarios import SCENARIOS
+from src.ui.grid import SpellerGrid
+from src.ui.menu import draw_menu
 
-from experiment.src.headset.streamer import Streamer
-from experiment.src.pipeline.bci_engine import BCIEngine
-from experiment.src.pipeline.predictor import CCAPredictor
-from experiment.src.pipeline.preprocessor import EEGPreprocessor
-from experiment.src.config.bci_config import (
+from src.headset.streamer import Streamer
+from src.pipeline.bci_engine import BCIEngine
+from src.pipeline.predictor import CCAPredictor
+from src.pipeline.preprocessor import EEGPreprocessor
+from src.config.bci_config import (
     TARGET_CHANNELS,
     SG_WINDOW,
     SG_POLYORDER,
