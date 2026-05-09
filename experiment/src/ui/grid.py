@@ -1,5 +1,5 @@
 import pygame
-from .stimulus import SSVEPStimulus
+from experiment.src.ui.stimulus import SSVEPStimulus
 
 class SpellerGrid:
     def __init__(self, screen_res, frequencies, labels):

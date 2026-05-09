@@ -27,6 +27,6 @@ cd data
 ## 🧠 Architecture
 - **Experiment App:** High-precision visual stimulation and real-time data streaming.
 ```bash
-poetry run python experiment/main.py
+poetry run python main.py
 ```
 - **Data & ML:** EEG data **offline** analysis with preprocessing and classification.
