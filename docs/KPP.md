@@ -10,7 +10,7 @@
   - Ewa Śmigaj - Frontend Developer
 - **Okres realizacji:** Od grudnia 2025 (w toku, faza implementacji technicznej)
 - **Repozytorium:** https://github.com/KN-Neuron/NeuroSpeller
-- **Wersja dokumentu:** 1.0 (Stan na 17.04.2026)
+- **Wersja dokumentu:** 1.0 (Stan na 09.05.2026)
 
 ---
 
@@ -63,12 +63,16 @@ Projekt opiera się na przepływie danych w czasie rzeczywistym z API BrainAcces
 
 ### 5.1 Struktura projektu
 ```
-/data
+/data <- tutaj EDA
+/docs <- tutaj KPP
+/experiment <- tutaj aplikacja badawcza
   /src
-/experiment 
-  /Speller
-  /eeg_headset
-/docs
+    /config
+    /headset
+    /pipeline
+    /scripts
+    /ui
+  /tests
 ```
 
 ### 5.2 Kluczowe elementy
@@ -84,9 +88,7 @@ Zastosowanie hierarchicznego systemu wpisywania (np. START -> "ABCDEFGHIJ" -> "A
 ## 6. Jak uruchomić projekt!
 
 ### 6.1 Wymagania
-- np. Node.js 18
-- .NET 8
-- Docker
+- 
 
 ### 6.2 Instalacja
 ```bash
