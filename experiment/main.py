@@ -1,6 +1,7 @@
 import pygame
 import sys
 import gc
+from concurrent.futures import ThreadPoolExecutor
 
 from src.config.app_config import *
 from src.config.scenarios import SCENARIOS
@@ -44,6 +45,9 @@ grid = SpellerGrid((WIDTH, HEIGHT), FREQS, ALPHABET_TREE["root"])
 state = "MENU"
 
 last_predict_time = 0
+
+prediction_executor = ThreadPoolExecutor(max_workers=1)
+prediction_future = None
 
 # Przechowuje wpisane słowo
 typed_text = ""
@@ -223,8 +227,13 @@ while running:
 
         current_time = pygame.time.get_ticks()
 
-        if current_time - last_predict_time > 3000:
-            predicted_freq = bci_engine.predict()
+        if current_time - last_predict_time > 3000 and prediction_future is None:
+            prediction_future = prediction_executor.submit(bci_engine.predict)
+
+        if prediction_future is not None and prediction_future.done():
+            predicted_freq = prediction_future.result()
+            prediction_future = None
+            last_predict_time = current_time
 
             if predicted_freq:
                 for stimulus in grid.stimuli:
@@ -276,5 +285,6 @@ while running:
 
 streamer.stop()
 streamer.save_to_file()
+prediction_executor.shutdown(wait=False)
 pygame.quit()
 sys.exit()
