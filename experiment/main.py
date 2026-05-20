@@ -20,14 +20,15 @@ from src.config.bci_config import (
     FREQS,
     WINDOW_TIME_FRAME,
     TRIAL_DURATION_MS,
-    REST_DURATION_MS
+    REST_DURATION_MS,
+    SAMPLES_PER_WINDOW
 )
 
 # 1. PyGame setup
 pygame.init()
-streamer = Streamer(device_name="BA MIDI 072", simulate=True)
+streamer = Streamer(device_name="BA MIDI 072", simulate=True, window_seconds=WINDOW_TIME_FRAME)
 preprocessor = EEGPreprocessor(TARGET_CHANNELS, SG_WINDOW, SG_POLYORDER)
-predictor = CCAPredictor(FREQS, SAMPLING_RATE, WINDOW_TIME_FRAME, 0.3)
+predictor = CCAPredictor(FREQS, SAMPLING_RATE, SAMPLES_PER_WINDOW, 0.3)
 bci_engine = BCIEngine(
     streamer=streamer, predictor=predictor, preprocessor=preprocessor
 )
