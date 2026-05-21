@@ -4,7 +4,7 @@ import gc
 from concurrent.futures import ThreadPoolExecutor
 
 from src.config.app_config import *
-from src.config.scenarios import SCENARIOS
+
 from src.ui.grid import SpellerGrid
 from src.ui.menu import draw_menu
 
@@ -57,8 +57,6 @@ current_tree_node = "root"
 node_history = []
 
 # Kalibracja offline
-wybrany_scenariusz = SCENARIOS["WPISZ_A"]
-calibration_sequence = wybrany_scenariusz
 calib_idx = 0
 current_target_freq = None
 phase_start_time = 0
@@ -82,6 +80,7 @@ while running:
                 state = "OFFLINE"
                 print("Startujemy fazę kalibracji...")
 
+                streamer.clear_session()
                 streamer.send_marker("START-PHASE-OFFLINE")
 
                 calib_idx = 0
@@ -115,65 +114,28 @@ while running:
             if elapsed_time > REST_DURATION_MS:
                 is_resting = False
 
-                if calib_idx < len(calibration_sequence):
-                    # 1. Bierzemy dokładny tekst ze scenariusza
-                    target_label = calibration_sequence[calib_idx]
-                    current_target_freq = None
-
-                    # 2. Przeszukujemy kafelki na ekranie
-                    for stimulus in grid.stimuli:
-                        if stimulus.label == target_label:
-                            current_target_freq = stimulus.freq
-                            break
-
-                    # 3. Akcja jeśli znaleziono kafelek
-                    if current_target_freq is not None:
-                        # Usuwamy entery (\n) na potrzeby czytelnego markera w pliku
-                        clean_label = target_label.replace('\n', ' ')
-                        streamer.send_marker(f"TARGET_{current_target_freq}_{clean_label}")
-                    else:
-                        print(f"[BŁĄD] Brak kafelka o nazwie '{target_label}' na tym ekranie!")
-
+                if calib_idx < len(grid.stimuli):
+                    # Bierzemy kolejny kafelek z ekranu (0..5)
+                    target_stimulus = grid.stimuli[calib_idx]
+                    current_target_freq = target_stimulus.freq
+                    clean_label = target_stimulus.label.replace('\n', ' ')
+                    streamer.send_marker(f"TARGET_{current_target_freq}_{clean_label}")
+                    print(f"[OFFLINE] Kafelek {calib_idx + 1}/6: '{clean_label}' @ {current_target_freq} Hz")
                     phase_start_time = current_time
                 else:
+                    # Przeszliśmy po wszystkich 6 kafelkach — koniec fazy
                     streamer.send_marker("STOP-PHASE-OFFLINE")
                     current_target_freq = None
+                    print("[OFFLINE] Kalibracja zakończona. Zapisuję dane do pliku FIF...")
+                    streamer.save_to_file("offline_calibration.fif")
+                    gc.enable()
                     state = "MENU"
         else:
-            # --- ZMIANA: KONIEC CZASU = SYMULACJA KLIKNIĘCIA ---
+            # Koniec czasu patrzenia na kafelek
             if elapsed_time > TRIAL_DURATION_MS:
-                for stimulus in grid.stimuli:
-                    if stimulus.freq == current_target_freq:
-                        # 1. Zaznacz na zielono
-                        stimulus.current_color = (0, 255, 0)
-                        label = stimulus.label
-
-                        # 2. Logika nawigacji (skopiowana z ONLINE)
-                        if label == "MAIN":
-                            current_tree_node = "root"
-                            node_history.clear()
-                            grid.set_labels(ALPHABET_TREE[current_tree_node])
-                        elif label == "BACK":
-                            if node_history:
-                                current_tree_node = node_history.pop()
-                            else:
-                                current_tree_node = "root"
-                            grid.set_labels(ALPHABET_TREE[current_tree_node])
-                        elif label == "UNDO" or label == "Del":
-                            typed_text = typed_text[:-1]
-                        elif label == "Blank":
-                            typed_text += " "
-                        elif label in ALPHABET_TREE:
-                            node_history.append(current_tree_node)
-                            current_tree_node = label
-                            grid.set_labels(ALPHABET_TREE[current_tree_node])
-                        else:
-                            if len(label) == 1:
-                                typed_text += label
-                                current_tree_node = "root"
-                                node_history.clear()
-                                grid.set_labels(ALPHABET_TREE[current_tree_node])
-                        break
+                # Zaznacz kafelek na zielono (feedback wizualny)
+                if calib_idx < len(grid.stimuli):
+                    grid.stimuli[calib_idx].current_color = (0, 255, 0)
 
                 is_resting = True
                 current_target_freq = None
@@ -182,29 +144,24 @@ while running:
 
         # --- RYSOWANIE KAFELKÓW I INTERFEJSU ---
         grid.update()
-        grid.draw(screen)  # Najpierw rysujemy kafelki
+        grid.draw(screen)
 
-        # Następnie nakładamy ramkę na wierzch wybranego kafelka
-        if not is_resting and current_target_freq is not None:
-            for stimulus in grid.stimuli:
-                if stimulus.freq == current_target_freq:
-                    pygame.draw.rect(screen, (255, 215, 0), stimulus.rect, 10)
+        # Ramka na wybranym kafelku
+        if not is_resting and calib_idx < len(grid.stimuli):
+            pygame.draw.rect(screen, (255, 215, 0), grid.stimuli[calib_idx].rect, 10)
 
-        # Rysowanie paska wpisanego tekstu w trybie OFFLINE (żeby widzieć efekt)
-        pygame.draw.rect(screen, COLOR_GRAY, (50, 80, WIDTH - 100, 70))
-        font_speller = pygame.font.SysFont("Arial", 48, bold=True)
-        text_surf = font_speller.render(typed_text + "_", True, COLOR_WHITE)
-        screen.blit(text_surf, (70, 90))
-
-        # Pasek postępu u góry
+        # Pasek informacyjny u góry
         pygame.draw.rect(screen, COLOR_GRAY, (0, 0, WIDTH, 70))
         font_inst = pygame.font.SysFont("Arial", 28, bold=True)
 
         if is_resting:
-            txt = font_inst.render(f"PRZERWA. Przygotuj się...", True, (150, 150, 150))
+            if calib_idx < len(grid.stimuli):
+                txt = font_inst.render(f"PRZERWA. Przygotuj się na kafelek {calib_idx + 1}/6...", True, (150, 150, 150))
+            else:
+                txt = font_inst.render("Kalibracja zakończona!", True, (0, 255, 0))
             screen.blit(txt, (WIDTH // 2 - txt.get_width() // 2, 20))
         else:
-            txt = font_inst.render("SKUP WZROK NA ZAZNACZONYM KAFELKU", True, (255, 215, 0))
+            txt = font_inst.render(f"SKUP WZROK NA ZAZNACZONYM KAFELKU ({calib_idx + 1}/6)", True, (255, 215, 0))
             screen.blit(txt, (WIDTH // 2 - txt.get_width() // 2, 5))
             progress_ratio = elapsed_time / TRIAL_DURATION_MS
             bar_width = int(400 * progress_ratio)
@@ -284,7 +241,6 @@ while running:
     clock.tick(60)
 
 streamer.stop()
-streamer.save_to_file()
 prediction_executor.shutdown(wait=False)
 pygame.quit()
 sys.exit()
