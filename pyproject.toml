@@ -1,26 +1,36 @@
-[tool.poetry]
+[project]
 name = "NeuroSpeller"
 version = "0.1.0"
 description = "SSVEP-based BCI speller"
-authors = ["KN Neuron"]
+authors = [{ name = "KN Neuron" }]
+requires-python = ">=3.11"
 readme = "README.md"
-package-mode = false
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+    "numpy>=2.4.6,<3",
+    "pygame>=2.5.0,<3",
+    "scikit-learn>=1.4.0,<2",
+    "scipy>=1.11.0,<2",
+]
 
-[tool.poetry.dependencies]
-python = "^3.11"
-numpy = "^1.26.0"
-pygame = "^2.5.0"
-scikit-learn = "^1.4.0"
-scipy = "^1.11.0"
+[dependency-groups]
+app = ["brainaccess>=3.6.1,<4"]
+data = [
+    "mne>=1.11.0,<2",
+    "pandas>=2.2.0,<3",
+    "matplotlib>=3.8.0,<4",
+]
 
-[tool.poetry.group.app.dependencies]
-brainaccess = "^3.6.1"
-
-[tool.poetry.group.data.dependencies]
-mne = "^1.11.0"
-pandas = "^2.2.0"
-matplotlib = "^3.8.0"
+[tool.uv]
+package = false
+default-groups = "all"
 
 [build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["uv_build>=0.8.22,<0.9.0"]
+build-backend = "uv_build"
