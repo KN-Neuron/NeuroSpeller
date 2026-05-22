@@ -1,10 +1,12 @@
 import threading
+
+import mne
 import numpy as np
 from brainaccess import core
 from brainaccess.core.eeg_manager import EEGManager
 import brainaccess.core.eeg_channel as eeg_channel
 from brainaccess.core.gain_mode import GainMode
-from src.config.bci_config import SAMPLING_RATE
+from ..config.bci_config import SAMPLING_RATE
 from typing import Any
 
 
@@ -26,11 +28,14 @@ class Streamer:
         self._mutex: threading.Lock = threading.Lock()
         self.manager: EEGManager = EEGManager()
         self.all_data_session: list[np.ndarray] = []
+        self.markers: list[tuple[float, str]] = []  # (timestamp_sec, label)
+        self._sample_counter: int = 0  # licznik próbek do obliczania czasu markerów
 
     def _on_chunk_received(self, chunk: Any, chunk_size: int) -> None:
         data: np.ndarray = np.array(chunk)
         eeg_data: np.ndarray = data[: self.num_channels, :]
         self.all_data_session.append(eeg_data)
+        self._sample_counter += chunk_size
 
         with self._mutex:
             self.buffer = np.roll(self.buffer, -chunk_size, axis=1)
@@ -99,11 +104,24 @@ class Streamer:
             print(f"[Streamer] Błąd przy zatrzymywaniu: {e}")
 
     def send_marker(self, label) -> None:
+        # Zawsze logujemy marker z aktualnym czasem (w sekundach)
+        timestamp_sec = self._sample_counter / self.sampling_rate
+        self.markers.append((timestamp_sec, label))
+        print(f"[Marker] t={timestamp_sec:.3f}s: {label}")
+
+        # Dodatkowo wysyłamy do urządzenia jeśli jest podłączone
         if not self.simulate and self.connected and self.manager:
             try:
                 self.manager.annotate(label)
             except Exception as e:
                 print(f"[Streamer] Błąd markera: {e}")
+
+    def clear_session(self) -> None:
+        """Czyści dane sesji przed nowym nagraniem."""
+        self.all_data_session.clear()
+        self.markers.clear()
+        self._sample_counter = 0
+        print("[Streamer] Sesja wyczyszczona.")
 
     def generate_mock_data(self, target_freq) -> None:
         if self.simulate:
@@ -137,10 +155,33 @@ class Streamer:
 
             self._on_chunk_received(chunk, chunk_samples)
 
-    def save_to_file(self, filename="badanie_eeg.npy") -> None:
+    def save_to_file(self, filename="badanie_eeg_raw.fif"):
         if not self.all_data_session:
-            print("Brak danych do zapisu.")
+            print("[Streamer] Brak danych do zapisania.")
             return
-        full_array = np.concatenate(self.all_data_session, axis=1)
-        np.save(filename, full_array)
-        print(f"Dane zapisane do {filename}. Shape: {full_array.shape}")
+
+        data = np.concatenate(self.all_data_session, axis=1)
+        ch_names = [f"CH_{i}" for i in range(self.num_channels)]
+        info = mne.create_info(
+            ch_names=ch_names,
+            sfreq=self.sampling_rate,
+            ch_types='eeg'
+        )
+        raw = mne.io.RawArray(data, info)
+
+        # Dodaj markery jako MNE Annotations do pliku FIF
+        if self.markers:
+            max_time = raw.times[-1]
+            onsets = [min(m[0], max_time) for m in self.markers]
+            descriptions = [m[1] for m in self.markers]
+            durations = [0.0] * len(self.markers)
+            annotations = mne.Annotations(
+                onset=onsets,
+                duration=durations,
+                description=descriptions
+            )
+            raw.set_annotations(annotations)
+            print(f"[Streamer] Dodano {len(self.markers)} markerów do pliku.")
+
+        raw.save(filename, overwrite=True)
+        print(f"[Streamer] Dane zapisane do {filename}. Shape: {data.shape}")
