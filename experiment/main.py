@@ -26,7 +26,7 @@ from src.config.bci_config import (
 
 # 1. PyGame setup
 pygame.init()
-streamer = Streamer(device_name="BA MIDI 072", simulate=True, window_seconds=WINDOW_TIME_FRAME)
+streamer = Streamer(device_name="BA MIDI 072", simulate=False, window_seconds=WINDOW_TIME_FRAME)
 preprocessor = EEGPreprocessor(TARGET_CHANNELS, SG_WINDOW, SG_POLYORDER)
 predictor = CCAPredictor(FREQS, SAMPLING_RATE, SAMPLES_PER_WINDOW, 0.3)
 bci_engine = BCIEngine(
