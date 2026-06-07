@@ -25,6 +25,8 @@ class CCAPredictor(Predictor):
         self.reference_signals_dict = self._generate_reference_signals_dictionary(
             window_length
         )
+        self.last_correlations: Dict[float, float] = {}
+        self.max_correlation: Optional[float] = None
 
     def _generate_reference_signals_for_frequency(
         self, length: int, freq: float, num_harmonics=2
@@ -60,10 +62,13 @@ class CCAPredictor(Predictor):
             Xc, Yc = self.cca.transform(X_preprocessed, Y)
 
             corr = np.corrcoef(Xc[:, 0], Yc[:, 0])[0, 1]
+            self.last_correlations[expected_freq] = corr
 
             if corr > max_corr:
                 max_corr = corr
                 best_freq = expected_freq
+
+        self.max_correlation = max_corr
 
         if max_corr > self.threshold:
             return best_freq
