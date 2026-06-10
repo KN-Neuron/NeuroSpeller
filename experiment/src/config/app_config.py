@@ -1,6 +1,6 @@
 
 # --- Ustawienia ekranu ---
-WIDTH, HEIGHT = 1280, 720
+WIDTH, HEIGHT = 1920, 1080
 REFRESH_RATE = 60
 
 # --- Struktura Alfabetu (Drzewo) ---

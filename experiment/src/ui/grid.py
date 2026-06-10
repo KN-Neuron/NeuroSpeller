@@ -12,38 +12,30 @@ class SpellerGrid:
         cols = 3
         rows = 2
 
-        # Odstęp między kafelkami
-        margin = 80  
+        # Stały rozmiar kafelka
+        size = 200
 
-        # 2. ------------------------------------ Symetryczne ustawianie siatki  ------------------------------------
-        
-        
-        # 2. Obliczamy maksymalny możliwy rozmiar kafelka, który wejdzie na ekran
-        available_w = self.width - (cols + 1) * margin
-        available_h = self.height - (rows + 1) * margin
-        
-        tile_w = available_w // cols
-        tile_h = available_h // rows
-        
-        # Rozmiar boku kwadratu (wybieramy mniejszy, by zachować proporcje 1:1)
-        size = min(tile_w, tile_h)
+        # Odstępy między kafelkami (niezależne od rozmiaru)
+        margin_x = 350
+        margin_y = 300
+
+        # 2. ------------------------------------ Ustawianie siatki  ------------------------------------
         
         # Całkowita szerokość i wysokość całego boxa gridu
-        total_grid_width = (cols * size) + ((cols - 1) * margin)
-        total_grid_height = (rows * size) + ((rows - 1) * margin)
+        total_grid_width = (cols * size) + ((cols - 1) * margin_x)
+        total_grid_height = (rows * size) + ((rows - 1) * margin_y)
         
-
         start_x = (self.width - total_grid_width) // 2
         start_y = (self.height - total_grid_height) // 2
         
-        # 5. ------------------------------------ Konstrukcja kafelków z uwzględnieniem offsetu ------------------------------------
+        # 5. ------------------------------------ Konstrukcja kafelków ------------------------------------
         for i in range(len(labels)):
             col = i % cols
             row = i // cols
             
             # Nowa pozycja z uwzględnieniem start_x i start_y
-            x = start_x + col * (size + margin)
-            y = start_y + row * (size + margin)
+            x = start_x + col * (size + margin_x)
+            y = start_y + row * (size + margin_y)
             
             s = SSVEPStimulus(x, y, size, frequencies[i], label=labels[i])
             self.stimuli.append(s)
