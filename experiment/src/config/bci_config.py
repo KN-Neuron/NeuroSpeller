@@ -8,10 +8,11 @@ FREQS = [6, 7.5, 8.57, 10, 12, 15]
 
 TARGET_CHANNELS = [11, 6, 1]
 
-# Savitzky-Golay parameters
-SG_WINDOW = 21
-SG_POLYORDER = 3
+# Bandpass filter parameters
+BANDPASS_ORDER = 4
+BANDPASS_LOW = 4.0
+BANDPASS_HIGH = 45.0
 
-# Faza offline (1000 = 1 sekunda)
-TRIAL_DURATION_MS = 5000  # Czas patrzenia na kafelek
-REST_DURATION_MS = 1000   # Czas przerwy na odpoczynek oczu
+NUM_HARMONICS = 4
+TRIAL_DURATION_MS = 7000
+REST_DURATION_MS = 3000

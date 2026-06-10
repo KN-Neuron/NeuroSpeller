@@ -1,4 +1,4 @@
-from scipy.signal import savgol_filter
+from scipy.signal import butter, sosfiltfilt
 from typing import Optional
 from abc import ABC, abstractmethod
 import numpy as np
@@ -12,11 +12,21 @@ class Preprocessor(ABC):
 
 class EEGPreprocessor(Preprocessor):
     def __init__(
-        self, target_channels: list[int], sg_window: int = 11, sg_polyorder: int = 3
+        self,
+        target_channels: list[int],
+        sampling_rate: float = 250,
+        bandpass_low: float = 4.0,
+        bandpass_high: float = 45.0,
+        bandpass_order: int = 4,
     ):
         self.target_channels = target_channels
-        self.sg_window = sg_window
-        self.sg_polyorder = sg_polyorder
+        self.sampling_rate = sampling_rate
+
+        nyquist = sampling_rate / 2.0
+        high = min(bandpass_high, nyquist - 1.0)
+        self.sos = butter(
+            bandpass_order, [bandpass_low, high], btype="band", fs=sampling_rate, output="sos"
+        )
 
     def preprocess(self, epoch: np.ndarray) -> Optional[np.ndarray]:
         if np.all(epoch == 0):
@@ -25,9 +35,6 @@ class EEGPreprocessor(Preprocessor):
         mean_signal = np.mean(epoch, axis=0)
         car_epoch = epoch - mean_signal
         X_target = car_epoch[self.target_channels, :]
-        X_filtered = savgol_filter(
-            X_target, window_length=self.sg_window, polyorder=self.sg_polyorder, axis=1
-        )
+        X_filtered = sosfiltfilt(self.sos, X_target, axis=1)
 
-        # Transpose to shape (samples, channels) for CCA
         return X_filtered.T

@@ -14,21 +14,29 @@ from src.pipeline.predictor import CCAPredictor
 from src.pipeline.preprocessor import EEGPreprocessor
 from src.config.bci_config import (
     TARGET_CHANNELS,
-    SG_WINDOW,
-    SG_POLYORDER,
     SAMPLING_RATE,
     FREQS,
     WINDOW_TIME_FRAME,
     TRIAL_DURATION_MS,
     REST_DURATION_MS,
-    SAMPLES_PER_WINDOW
+    SAMPLES_PER_WINDOW,
+    BANDPASS_LOW,
+    BANDPASS_HIGH,
+    BANDPASS_ORDER,
+    NUM_HARMONICS,
 )
 
 # 1. PyGame setup
 pygame.init()
 streamer = Streamer(device_name="BA MIDI 072", simulate=False, window_seconds=WINDOW_TIME_FRAME)
-preprocessor = EEGPreprocessor(TARGET_CHANNELS, SG_WINDOW, SG_POLYORDER)
-predictor = CCAPredictor(FREQS, SAMPLING_RATE, SAMPLES_PER_WINDOW, 0.3)
+preprocessor = EEGPreprocessor(
+    TARGET_CHANNELS,
+    sampling_rate=SAMPLING_RATE,
+    bandpass_low=BANDPASS_LOW,
+    bandpass_high=BANDPASS_HIGH,
+    bandpass_order=BANDPASS_ORDER,
+)
+predictor = CCAPredictor(FREQS, SAMPLING_RATE, SAMPLES_PER_WINDOW, 0.3, num_harmonics=NUM_HARMONICS)
 bci_engine = BCIEngine(
     streamer=streamer, predictor=predictor, preprocessor=preprocessor
 )

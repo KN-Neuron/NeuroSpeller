@@ -9,6 +9,14 @@ class SSVEPStimulus:
         self.refresh_rate = refresh_rate
         self.start_time = time.perf_counter()
         
+        self.frame_count = 0
+        if self.freq > 0:
+            self.half_period_frames = max(1, round(refresh_rate / (2 * freq)))
+            self.actual_freq = refresh_rate / (2 * self.half_period_frames)
+        else:
+            self.half_period_frames = 0
+            self.actual_freq = 0
+        
         # Kolory
         self.current_color = (0, 0, 0) 
         self.text_color = (255, 255, 255) 
@@ -77,13 +85,17 @@ class SSVEPStimulus:
             self.rendered_text.append((line_surf, line_rect))
 
     def update(self):
-        t = time.perf_counter() - self.start_time
+        if self.freq <= 0:
+            self.current_color = (127, 0, 0)
+            return
+
+        self.frame_count += 1
+        full_period = 2 * self.half_period_frames
         
-        sine_val = math.sin(2 * math.pi * self.freq * t)
-        
-        intensity = int(127.5 * (sine_val * 0.5 + 1.0))
-        
-        self.current_color = (intensity, 0, 0)
+        if (self.frame_count % full_period) < self.half_period_frames:
+            self.current_color = (255, 255, 255)
+        else:
+            self.current_color = (0, 0, 0)
 
     def draw(self, surface):
         # Renderowanie boxa

@@ -7,7 +7,7 @@ plt.style.use("seaborn-v0_8-darkgrid")
 
 
 def plot_time_series(
-    time, raw_signal, car_signal, filtered_signal, ch_idx, sg_window=21, sg_polyorder=3
+    time, raw_signal, car_signal, filtered_signal, ch_idx
 ):
     plt.figure(figsize=(12, 6))
 
@@ -16,7 +16,7 @@ def plot_time_series(
     plt.plot(
         time,
         filtered_signal,
-        label=f"SG Filter (win={sg_window}, order={sg_polyorder})",
+        label=f"Bandpass Filter",
         linewidth=1.5,
         color="red",
     )
@@ -67,7 +67,7 @@ def plot_psd(f_raw, psd_raw, f_filt, psd_filt):
     plt.semilogy(
         f_filt[plot_range_filt],
         psd_filt[plot_range_filt],
-        label=f"Wzbogacony Sygnał (SG Filter)",
+        label=f"Filtrowany Sygnał (Bandpass)",
         color="red",
         linewidth=1.5,
     )

@@ -4,13 +4,14 @@ import mne
 
 
 def load_raw_data(
-    filename: str, l_freq: float = 6.0, h_freq: float = 30.0
+    filename: str, l_freq: float = 4.0, h_freq: float = 45.0
 ) -> mne.io.Raw:
     try:
         raw = mne.io.read_raw_fif(filename, preload=True)
         raw = raw.load_data()
         raw = raw.pick_types(eeg=True, stim=False, eog=False, exclude="bads")
         raw.apply_function(lambda x: x * 10**-6)
+
         raw.filter(l_freq=l_freq, h_freq=h_freq)
         raw.notch_filter(freqs=50)
         return raw
@@ -18,12 +19,11 @@ def load_raw_data(
         print(f"Nie można znaleźć pliku '{filename}'.")
         return None
 
-
 def load_data(
     filename: str,
     target_marker_freqs: list[float],
-    l_freq: float = 6.0,
-    h_freq: float = 30.0,
+    l_freq: float = 4.0,
+    h_freq: float = 45.0,
     window_time_frame: int = 5,
 ) -> dict[np.ndarray] | None:
     raw = load_raw_data(filename, l_freq=l_freq, h_freq=h_freq)
