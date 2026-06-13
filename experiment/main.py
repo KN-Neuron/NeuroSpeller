@@ -49,9 +49,11 @@ pygame.display.set_caption("SSVEP Speller Experiment")
 # 3. Zegar
 clock = pygame.time.Clock()
 
-# 4. Tworzymy obiekt
 grid = SpellerGrid((WIDTH, HEIGHT), FREQS, ALPHABET_TREE["root"])
 state = "MENU"
+
+font_inst = pygame.font.SysFont("Arial", 28, bold=True)
+font_speller = pygame.font.SysFont("Arial", 48, bold=True)
 
 last_predict_time = 0
 
@@ -70,6 +72,8 @@ calib_idx = 0
 current_target_freq = None
 phase_start_time = 0
 is_resting = True
+frame_drops_count = 0
+max_frame_delay = 0
 
 running = True
 
@@ -95,6 +99,8 @@ while running:
                 calib_idx = 0
                 is_resting = True
                 phase_start_time = pygame.time.get_ticks()
+                frame_drops_count = 0
+                max_frame_delay = 0
 
             if event.key == pygame.K_2:
                 gc.disable()
@@ -136,6 +142,14 @@ while running:
                     streamer.send_marker("STOP-PHASE-OFFLINE")
                     current_target_freq = None
                     print("[OFFLINE] Kalibracja zakończona. Zapisuję dane do pliku FIF...")
+                    
+                    print("\n--- RAPORT WYDAJNOŚCI (FRAME DROPS) ---")
+                    print(f"Liczba zgubionych klatek: {frame_drops_count}")
+                    if frame_drops_count > 0:
+                        print(f"Maksymalne opóźnienie klatki: {max_frame_delay} ms (oczekiwane ~16.7 ms)")
+                        print("UWAGA: Frame dropy drastycznie niszczą SSVEP dla wyższych częstotliwości (10-15 Hz)!")
+                    print("---------------------------------------\n")
+                    
                     streamer.save_to_file("offline_calibration.fif")
                     gc.enable()
                     state = "MENU"
@@ -161,7 +175,6 @@ while running:
 
         # Pasek informacyjny u góry
         pygame.draw.rect(screen, COLOR_GRAY, (0, 0, WIDTH, 70))
-        font_inst = pygame.font.SysFont("Arial", 28, bold=True)
 
         if is_resting:
             if calib_idx < len(grid.stimuli):
@@ -183,7 +196,6 @@ while running:
 
         # RYSOWANIE PASKA TEKSTU NA GÓRZE EKRANU
         pygame.draw.rect(screen, COLOR_GRAY, (50, 20, WIDTH - 100, 70))
-        font_speller = pygame.font.SysFont("Arial", 48, bold=True)
         text_surf = font_speller.render(typed_text + "_", True, COLOR_WHITE)
         screen.blit(text_surf, (70, 30))
 
@@ -247,7 +259,12 @@ while running:
 
     pygame.display.flip()
 
-    clock.tick(60)
+    dt = clock.tick(60)
+    if state == "OFFLINE" and not is_resting:
+        if dt > 20:
+            frame_drops_count += 1
+            if dt > max_frame_delay:
+                max_frame_delay = dt
 
 streamer.stop()
 prediction_executor.shutdown(wait=False)

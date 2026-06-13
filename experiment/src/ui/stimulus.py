@@ -10,12 +10,7 @@ class SSVEPStimulus:
         self.start_time = time.perf_counter()
         
         self.frame_count = 0
-        if self.freq > 0:
-            self.half_period_frames = max(1, round(refresh_rate / (2 * freq)))
-            self.actual_freq = refresh_rate / (2 * self.half_period_frames)
-        else:
-            self.half_period_frames = 0
-            self.actual_freq = 0
+        self.phase = 0.0
         
         # Kolory
         self.current_color = (0, 0, 0) 
@@ -89,10 +84,11 @@ class SSVEPStimulus:
             self.current_color = (127, 0, 0)
             return
 
-        self.frame_count += 1
-        full_period = 2 * self.half_period_frames
-        
-        if (self.frame_count % full_period) < self.half_period_frames:
+        self.phase += self.freq / self.refresh_rate
+        while self.phase >= 1.0:
+            self.phase -= 1.0
+            
+        if self.phase < 0.5:
             self.current_color = (255, 255, 255)
         else:
             self.current_color = (0, 0, 0)
